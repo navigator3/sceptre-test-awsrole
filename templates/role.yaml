@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The name of your environment (this can be different than the required "tr:environment-type" tag.
+    Default: ci
+  Jurisdiction:
+    Type: String
+    Default: us
+    Description: Lambda pipeline jurisdiction
+  IndexAPISecretArn:
+    Type: String
+    Default: qqqq
+    Description: Index API credentials secret
+  S3bucketARN:
+    Type: String
+    Description: Index API credentials secret
+    Default: '*' 
+
+
+Resources:
+
+  PldaBucketReadPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn:
+      - CandidateRetrievalIamRole
+    Properties:
+      PolicyName: !Sub a204236-plda-${Jurisdiction}-bucket-read-${Environment}
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource:  !Ref S3bucketARN
+      Roles:
+        - !Ref CandidateRetrievalIamRole
+
+# Lambda roles:
+  CandidateRetrievalIamRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Description: Allows Lambda functions to call AWS services on your behalf.
+#      ManagedPolicyArns:
+#        - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+      Path: "/"
+      PermissionsBoundary: "arn:aws:iam::aws:policy/AdministratorAccess"
+      RoleName: !Sub a204236-plda-${Jurisdiction}-candidateretrieval-role-${Environment}-use1

@@ -1,0 +1,4 @@
+template_path: role.yaml
+parameters:
+  S3bucketARN: '*'
+  #  Jurisdiction: 'ukk'
